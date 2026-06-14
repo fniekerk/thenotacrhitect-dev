@@ -1,0 +1,45 @@
+---
+title: Hello World
+slug: hello-world
+description: The first post on this blog — introducing what this site is about and what you can expect going forward.
+date: 2026-06-14
+published: true
+tags:
+  - meta
+  - introduction
+author: Blog Author
+---
+
+## Welcome
+
+This is the first post on the blog. It's built with **Next.js 16**, **Tailwind CSS 4**, and **Velite** for typed MDX content — deployed automatically to Vercel on every push.
+
+## What to Expect
+
+- Deep-dive technical articles
+- Niche topic explorations
+- Practical tutorials with working code
+
+## Stack at a Glance
+
+| Layer | Technology |
+| --- | --- |
+| Framework | Next.js 16 (App Router) |
+| Content | MDX via Velite |
+| Styling | Tailwind CSS 4 |
+| Hosting | Vercel |
+| DNS/CDN | Cloudflare |
+
+## Code Example
+
+```typescript
+// lib/posts.ts
+export async function getAllPosts(): Promise<Post[]> {
+  const { posts } = await import("@/.velite");
+  return posts
+    .filter((p) => p.published)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+```
+
+More posts coming soon.
