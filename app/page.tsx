@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getAllPosts } from "@/lib/posts";
+
+export const revalidate = 60;
 import { PostCard } from "@/components/blog/PostCard";
 import { AnimatedSection } from "@/components/animations/AnimatedSection";
 import { PostsContainer } from "@/components/animations/PostsContainer";
@@ -19,14 +21,14 @@ export default async function HomePage() {
         <h1 className="sr-only">
           The Not Architect — I draw boxes, cross them out, and ship.
         </h1>
-        <div className="rounded-2xl bg-brand-panel p-8 sm:p-10 ring-1 ring-white/10 shadow-sm">
+        <div className="rounded-2xl bg-brand-panel p-0 ring-1 ring-white/10 shadow-sm">
           <Image
             src="/thenotarchitect_logo_final.svg"
             alt="The Not Architect — a crossed-out C4 context diagram beside the wordmark"
             width={680}
             height={320}
             priority
-            className="h-auto w-full max-w-xl"
+            className="h-auto w-full max-w-xl block"
           />
         </div>
         <p className="mt-6 text-lg text-muted-foreground">

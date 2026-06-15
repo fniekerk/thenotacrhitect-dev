@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { getAllPosts } from "@/lib/posts";
 
+export const dynamic = "force-dynamic";
+
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 

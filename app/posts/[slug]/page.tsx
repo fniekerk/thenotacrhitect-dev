@@ -1,23 +1,28 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { MDXContent } from "@/components/blog/MDXContent";
-import { getPostBySlug, getAllPosts } from "@/lib/posts";
+import { MDXRemote } from "next-mdx-remote/rsc";
+import rehypeSlug from "rehype-slug";
+import { getPostBySlug, getAllSlugs } from "@/lib/posts";
 import { TOC } from "@/components/blog/TOC";
 import { Badge } from "@/components/ui/Badge";
 import { AnimatedSection } from "@/components/animations/AnimatedSection";
+
+export const revalidate = 60;
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
-  const posts = await getAllPosts();
-  return posts.map((post) => ({ slug: post.slug }));
+  try {
+    const slugs = await getAllSlugs();
+    return slugs.map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
-export async function generateMetadata({
-  params,
-}: PostPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
   if (!post) return {};
@@ -39,7 +44,7 @@ export async function generateMetadata({
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
-  if (!post) notFound();
+  if (!post || !post.published) notFound();
 
   return (
     <article className="max-w-3xl mx-auto">
@@ -68,9 +73,7 @@ export default async function PostPage({ params }: PostPageProps) {
             })}
           </time>
           {post.author && (
-            <span className="before:content-['·'] before:mx-2">
-              {post.author}
-            </span>
+            <span className="before:content-['·'] before:mx-2">{post.author}</span>
           )}
         </p>
       </AnimatedSection>
@@ -83,7 +86,10 @@ export default async function PostPage({ params }: PostPageProps) {
 
       <AnimatedSection delay={0.2}>
         <div className="prose prose-slate dark:prose-invert max-w-none">
-          <MDXContent code={post.content} />
+          <MDXRemote
+            source={post.content}
+            options={{ mdxOptions: { rehypePlugins: [rehypeSlug] } }}
+          />
         </div>
       </AnimatedSection>
     </article>

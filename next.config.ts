@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-// CSP with dynamic nonce is handled in middleware.ts
+// CSP with dynamic nonce is handled in proxy.ts
 const securityHeaders = [
   {
     key: "Strict-Transport-Security",

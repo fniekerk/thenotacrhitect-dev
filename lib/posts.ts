@@ -1,49 +1,62 @@
-export interface TocEntry {
-  title: string;
-  url: string;
-  items?: TocEntry[];
-}
+import { db } from "@/lib/db";
+import { posts } from "@/lib/db/schema";
+import { eq, desc, sql } from "drizzle-orm";
+
+export type { TocEntry } from "@/lib/db/schema";
 
 export interface Post {
+  id: number;
   slug: string;
   title: string;
   description: string;
   date: string;
+  content: string;
   published: boolean;
   tags: string[];
-  author?: string;
-  image?: string;
-  // Velite compiles MDX to a serialised JS string; render via <MDXContent code={post.content} />
-  content: string;
-  toc: TocEntry[];
-}
-
-async function getPosts(): Promise<Post[]> {
-  const { posts } = await import("@/.velite");
-  // Velite injects `content` and `toc` at runtime for MDX collections.
-  // The generated types don't reflect this, so we cast through unknown.
-  return posts as unknown as Post[];
+  author: string | null;
+  image: string | null;
+  toc: import("@/lib/db/schema").TocEntry[];
 }
 
 export async function getAllPosts(): Promise<Post[]> {
-  const posts = await getPosts();
-  return posts
-    .filter((post) => post.published)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return db
+    .select()
+    .from(posts)
+    .where(eq(posts.published, true))
+    .orderBy(desc(posts.date)) as Promise<Post[]>;
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | undefined> {
-  const posts = await getPosts();
-  return posts.find((post) => post.slug === slug && post.published);
+  const [post] = await db
+    .select()
+    .from(posts)
+    .where(eq(posts.slug, slug))
+    .limit(1);
+  return post as Post | undefined;
 }
 
 export async function getPostsByTag(tag: string): Promise<Post[]> {
-  const posts = await getAllPosts();
-  return posts.filter((post) => post.tags.includes(tag));
+  return db
+    .select()
+    .from(posts)
+    .where(sql`${posts.tags} @> ARRAY[${tag}]::text[] AND ${posts.published} = true`)
+    .orderBy(desc(posts.date)) as Promise<Post[]>;
 }
 
 export async function getAllTags(): Promise<string[]> {
-  const posts = await getAllPosts();
-  const tagSet = new Set(posts.flatMap((post) => post.tags));
+  const result = await db
+    .select({ tags: posts.tags })
+    .from(posts)
+    .where(eq(posts.published, true));
+
+  const tagSet = new Set(result.flatMap((r) => r.tags ?? []));
   return Array.from(tagSet).sort();
+}
+
+export async function getAllSlugs(): Promise<string[]> {
+  const result = await db
+    .select({ slug: posts.slug })
+    .from(posts)
+    .where(eq(posts.published, true));
+  return result.map((r) => r.slug);
 }

@@ -1,7 +1,17 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifyToken } from "@/lib/auth";
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+    const token = request.cookies.get("admin_token")?.value;
+    if (!token || !(await verifyToken(token))) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+  }
+
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
 
   // React's dev build requires 'unsafe-eval'; production stays strict (nonce + strict-dynamic).

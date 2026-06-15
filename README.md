@@ -1,6 +1,6 @@
 # The Not Architect
 
-A technical and niche content blog ([thenotarchitect.dev](https://thenotarchitect.dev)) built with Next.js 16, Tailwind CSS 4, and Velite for typed MDX content.
+A technical and niche content blog ([thenotarchitect.dev](https://thenotarchitect.dev)) built with Next.js 16, Tailwind CSS 4, Drizzle ORM, and NeonDB.
 
 > *I draw boxes, cross them out, and ship.*
 
@@ -9,7 +9,8 @@ A technical and niche content blog ([thenotarchitect.dev](https://thenotarchitec
 | Layer | Technology |
 |---|---|
 | Framework | Next.js 16.2.7 (App Router, Turbopack) |
-| Content | MDX via Velite 0.3.1 |
+| Content | Postgres (NeonDB) + `next-mdx-remote` |
+| ORM | Drizzle ORM + `postgres` driver |
 | Styling | Tailwind CSS 4.3.1 |
 | Testing | Vitest 4.1.8 + React Testing Library |
 | Hosting | Vercel |
@@ -18,8 +19,29 @@ A technical and niche content blog ([thenotarchitect.dev](https://thenotarchitec
 
 ## Getting started
 
+### Prerequisites
+
+- Docker (running in WSL for Windows) for local Postgres
+- pnpm
+
+### Setup
+
 ```bash
 pnpm install
+
+# Copy and fill in env vars
+cp .env.local.example .env.local
+
+# Start local Postgres
+pnpm db:up
+
+# Push schema to DB
+pnpm db:push
+
+# Seed the hello-world post
+pnpm db:seed
+
+# Start dev server
 pnpm dev
 ```
 
@@ -27,89 +49,68 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Writing posts
 
-Posts are plain **MDX files** in `content/posts/`. There is no database and no CMS — a post is a file in the repo. [Velite](https://velite.js.org) reads each file at build time, validates its frontmatter against a Zod schema (`velite.config.ts`), and compiles it to typed, statically-rendered HTML.
+### Via the admin UI
 
-### Create a new post
+Go to [http://localhost:3000/admin/new-post](http://localhost:3000/admin/new-post) and sign in with your `ADMIN_PASSWORD`. Fill in the form and click **Publish post** — the post is inserted directly into the database and live within seconds. No deploy required.
 
-1. Add a file under `content/posts/`, e.g. `content/posts/my-first-post.mdx`. The file name is just for your reference — the URL comes from the `slug` field.
-2. Start with the frontmatter block (between the `---` fences), then write the body in Markdown/MDX:
+### Via the database directly
 
-```mdx
----
-title: My First Post
-slug: my-first-post
-description: A short summary shown in the post list, RSS feed, and OG image.
-date: 2026-06-14
-published: true
-tags:
-  - nextjs
-  - tutorial
-author: The Not Architect
----
+Insert a row into the `posts` table:
 
-## Introduction
-
-Write your content here using **Markdown**. You can use headings, lists,
-tables, links, images, and fenced code blocks.
-```
-
-3. Preview locally with `pnpm dev` and open <http://localhost:3000>. Velite re-compiles on save, so the post appears (and updates) live.
-4. Commit and push to `main`. Vercel rebuilds and deploys automatically — no manual step.
-
-The post is published at `/posts/<slug>` (e.g. `/posts/my-first-post`).
-
-### Frontmatter reference
-
-Validated by the schema in `velite.config.ts`. The build **fails** if a required field is missing or a value is out of range, so a broken post can never reach production.
-
-| Field | Required | Type / rules | Purpose |
-|---|---|---|---|
-| `title` | **Yes** | string, 1–200 chars | Post heading, `<title>` tag, OG image |
-| `slug` | **Yes** | string, **unique across all posts** | The URL path (`/posts/<slug>`) |
-| `description` | **Yes** | string, 1–500 chars | Post list, meta description, RSS, OG image |
-| `date` | **Yes** | ISO date `YYYY-MM-DD` | Sort order (newest first) and displayed date |
-| `published` | No | boolean, default `true` | Set `false` to keep a post as a hidden draft |
-| `tags` | No | array of strings, default `[]` | Tag badges on the card and post page |
-| `author` | No | string | Shown in the post byline |
-| `image` | No | string (path/URL) | Optional social-share image override |
-
-`toc` (table of contents) and `content` are generated automatically from the body — do **not** add them to frontmatter.
-
-### Edit an existing post
-
-Open the `.mdx` file, change the frontmatter or body, save, and verify with `pnpm dev`. Commit and push to deploy.
-
-- **Renaming a URL:** change the `slug`. Note this breaks the old URL — add a redirect in `next.config.ts` if the post was already public.
-- **Updating the visible date:** change `date` (this also re-sorts the post in the list).
+| Column | Required | Notes |
+|---|---|---|
+| `slug` | **Yes** | Unique; becomes the URL `/posts/<slug>` |
+| `title` | **Yes** | 1–200 chars |
+| `description` | **Yes** | Shown in the post list, RSS, and OG image |
+| `date` | **Yes** | `YYYY-MM-DD` — controls sort order |
+| `content` | **Yes** | Raw MDX body (no frontmatter fences) |
+| `published` | No | Boolean, default `true`; set `false` for drafts |
+| `tags` | No | Postgres `text[]`, default `{}` |
+| `author` | No | Shown in the post byline |
+| `image` | No | Social-share image override |
+| `toc` | No | `jsonb` array of `{ title, url, depth }` — auto-generated by the admin UI |
 
 ### Drafts
 
-Set `published: false`. The post is excluded from the home page, RSS feed, sitemap, and static generation, but stays in the repo so you can keep editing it. Flip it to `true` when ready.
+Set `published = false`. The post is excluded from the home page, RSS feed, and sitemap. Flip it to `true` when ready.
 
 ### Images in a post
 
-Place images under `public/` and reference them with an absolute path. Use the Next.js `Image` component (raw `<img>` is discouraged for performance):
+Place images under `public/` and use the Next.js `Image` component in MDX:
 
 ```mdx
 import Image from "next/image";
 
-<Image src="/posts/my-first-post/diagram.png" alt="Architecture diagram" width={800} height={450} />
+<Image src="/posts/my-post/diagram.png" alt="Diagram" width={800} height={450} />
 ```
-
-### Markdown / MDX features
-
-Standard Markdown works out of the box — headings (which feed the auto table of contents), **bold**, _italic_, lists, tables, blockquotes, links, and fenced code blocks with language hints (```` ```ts ````). Because these are MDX files, you can also import and embed React components inline. See `content/posts/hello-world.mdx` for a working example.
 
 ## Commands
 
 | Command | Description |
 |---|---|
 | `pnpm dev` | Start the development server |
-| `pnpm build` | Run Velite then build for production |
+| `pnpm build` | Build for production |
 | `pnpm test` | Run the full test suite |
 | `pnpm test:coverage` | Run tests with coverage report |
-| `pnpm audit` | Check for known vulnerabilities |
 | `pnpm lint` | Run ESLint |
+| `pnpm audit` | Check for known vulnerabilities |
+| `pnpm db:up` | Start local Postgres in Docker |
+| `pnpm db:down` | Stop local Postgres |
+| `pnpm db:push` | Push schema changes to the DB (dev) |
+| `pnpm db:migrate` | Generate + run migrations (prod) |
+| `pnpm db:studio` | Open Drizzle Studio (DB browser) |
+| `pnpm db:seed` | Seed the hello-world post |
+
+## Environment variables
+
+Copy `.env.local.example` to `.env.local` for local development.
+
+| Variable | Required | Description |
+|---|---|---|
+| `DATABASE_URL` | **Yes** | Postgres connection string |
+| `ADMIN_PASSWORD` | **Yes** | Password for `/admin` |
+| `ADMIN_JWT_SECRET` | **Yes** | JWT signing secret (≥32 chars) |
+| `NEXT_PUBLIC_SITE_URL` | No | Production URL — defaults to `http://localhost:3000` |
 
 ## CI
 
@@ -118,23 +119,25 @@ GitHub Actions runs on every push and pull request to `main`:
 1. Install dependencies (`--frozen-lockfile`)
 2. Lint
 3. Security audit (`pnpm audit --audit-level=high`)
-4. Test with coverage (≥ 80% threshold enforced)
+4. Test with coverage (≥80% threshold enforced)
 
 Build and deployment are handled entirely by Vercel.
 
 ## Deployment
 
-Deployment is managed through the Vercel dashboard (not GitHub Actions). Vercel auto-deploys on push to `main` and creates preview deployments for pull requests.
+1. Push to GitHub and connect the repo in the Vercel dashboard
+2. Create a [NeonDB](https://neon.tech) project; copy the connection string
+3. Set env vars in Vercel: `DATABASE_URL`, `ADMIN_PASSWORD`, `ADMIN_JWT_SECRET`, `NEXT_PUBLIC_SITE_URL`
+4. Run `pnpm db:push` once against the Neon DB to create the schema
+5. Run `pnpm db:seed` once to insert the hello-world post (optional)
+6. Point your custom domain via Cloudflare
 
-Set the following environment variable in your Vercel project settings:
-
-| Variable | Description |
-|---|---|
-| `NEXT_PUBLIC_SITE_URL` | The production URL (e.g. `https://yourdomain.com`) |
+Vercel auto-deploys on push to `main`. Posts published via the admin UI are live within seconds — no redeploy needed.
 
 ## Security
 
-- All HTTP security headers configured in `next.config.ts` (CSP, HSTS, X-Frame-Options, etc.)
+- CSP with dynamic nonce, HSTS, X-Frame-Options, and other headers set in `proxy.ts` and `next.config.ts`
+- Admin routes protected by JWT cookie; password never stored, only compared at login time
+- MDX compiled at request time by `next-mdx-remote` (no `eval` of untrusted input)
 - Dependencies audited via `pnpm audit` in CI — build fails on high/critical CVEs
-- Dependency updates automated via Renovate (10-day minimum release age)
 - No secrets committed to the repository

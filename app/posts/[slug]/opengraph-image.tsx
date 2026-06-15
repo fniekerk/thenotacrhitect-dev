@@ -9,8 +9,12 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const posts = await getAllPosts();
-  return posts.map((post) => ({ slug: post.slug }));
+  try {
+    const posts = await getAllPosts();
+    return posts.map((post) => ({ slug: post.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export default async function OGImage({ params }: Props) {
