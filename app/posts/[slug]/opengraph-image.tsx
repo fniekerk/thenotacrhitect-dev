@@ -44,7 +44,7 @@ export default async function OGImage({ params }: Props) {
             fontFamily: "serif",
           }}
         >
-          <span style={{ color: "#e05a2b", fontSize: 30 }}>✕</span>
+          <span style={{ color: "#e05a2b", fontSize: 30, fontWeight: 700 }}>X</span>
           <span style={{ color: "#94a3b8" }}>The Not Architect</span>
         </div>
         <div
