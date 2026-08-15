@@ -5,6 +5,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import rehypeSlug from "rehype-slug";
 import { getPostBySlug, getAllSlugs } from "@/lib/posts";
 import { TOC } from "@/components/blog/TOC";
+import { FloatingScrollNav } from "@/components/blog/FloatingScrollNav";
 import { Badge } from "@/components/ui/Badge";
 import { AnimatedSection } from "@/components/animations/AnimatedSection";
 
@@ -83,74 +84,87 @@ export default async function PostPage({ params }: PostPageProps) {
   };
 
   return (
-    <article className="max-w-3xl mx-auto">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <AnimatedSection className="mb-10">
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {post.tags.map((tag) => (
-            <Badge key={tag} variant="muted">
-              {tag}
-            </Badge>
-          ))}
-        </div>
-        <h1 className="text-4xl font-bold tracking-tight mb-4 leading-tight">
-          {post.title}
-        </h1>
-        {post.description && (
-          <p className="text-xl text-muted-foreground mb-4 leading-relaxed">
-            {post.description}
-          </p>
-        )}
-        <p className="text-sm text-muted-foreground/70">
-          <time dateTime={post.date}>
-            {new Date(post.date).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </time>
-          {post.author && (
-            <span className="before:content-['·'] before:mx-2">{post.author}</span>
-          )}
-        </p>
-      </AnimatedSection>
-
-      {post.image && (
-        <AnimatedSection delay={0.1} className="mb-8">
-          <div className="relative w-full aspect-[2/1] rounded-lg overflow-hidden">
-            <Image
-              src={post.image}
-              alt={post.title}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 768px) 100vw, 768px"
-            />
-          </div>
-        </AnimatedSection>
-      )}
-
-      {post.toc && post.toc.length > 0 && (
-        <AnimatedSection direction="left" delay={0.1} className="mb-8">
-          <TOC items={post.toc} />
-        </AnimatedSection>
-      )}
-
-      <AnimatedSection delay={0.2}>
-        <div className="prose prose-slate dark:prose-invert max-w-none">
-          <MDXRemote
-            source={post.content}
-            options={{ mdxOptions: { rehypePlugins: [rehypeSlug] } }}
+    <>
+      <FloatingScrollNav />
+      <div className="lg:grid lg:grid-cols-[1fr_220px] lg:gap-10">
+        <article className="min-w-0">
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
           />
-        </div>
-      </AnimatedSection>
-    </article>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+          />
+          <AnimatedSection className="mb-10">
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {post.tags.map((tag) => (
+                <Badge key={tag} variant="muted">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+            <h1 className="text-4xl font-bold tracking-tight mb-4 leading-tight">
+              {post.title}
+            </h1>
+            {post.description && (
+              <p className="text-xl text-muted-foreground mb-4 leading-relaxed">
+                {post.description}
+              </p>
+            )}
+            <p className="text-sm text-muted-foreground/70">
+              <time dateTime={post.date}>
+                {new Date(post.date).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </time>
+              {post.author && (
+                <span className="before:content-['·'] before:mx-2">{post.author}</span>
+              )}
+            </p>
+          </AnimatedSection>
+
+          {post.image && (
+            <AnimatedSection delay={0.1} className="mb-8">
+              <div className="relative w-full aspect-[2/1] rounded-lg overflow-hidden">
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 672px"
+                />
+              </div>
+            </AnimatedSection>
+          )}
+
+          {post.toc && post.toc.length > 0 && (
+            <AnimatedSection direction="left" delay={0.1} className="mb-8 lg:hidden">
+              <TOC items={post.toc} />
+            </AnimatedSection>
+          )}
+
+          <AnimatedSection delay={0.2}>
+            <div className="prose prose-slate dark:prose-invert max-w-none">
+              <MDXRemote
+                source={post.content}
+                options={{ mdxOptions: { rehypePlugins: [rehypeSlug] } }}
+              />
+            </div>
+          </AnimatedSection>
+        </article>
+
+        {post.toc && post.toc.length > 0 && (
+          <aside className="hidden lg:block">
+            <div className="sticky top-24">
+              <TOC items={post.toc} />
+            </div>
+          </aside>
+        )}
+      </div>
+    </>
   );
 }
