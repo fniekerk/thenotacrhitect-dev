@@ -13,6 +13,7 @@ interface UpdatePostBody {
   tags: string[];
   published: boolean;
   author?: string;
+  image?: string;
   content: string;
 }
 
@@ -36,7 +37,7 @@ export async function PUT(request: NextRequest) {
   }
 
   const body: UpdatePostBody = await request.json();
-  const { slug, title, description, date, tags, published, author, content } = body;
+  const { slug, title, description, date, tags, published, author, image, content } = body;
 
   if (!slug || !title || !description || !date || !content) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -54,6 +55,7 @@ export async function PUT(request: NextRequest) {
       published,
       tags: tags ?? [],
       author: author || null,
+      image: image !== undefined ? (image || null) : undefined,
       toc,
       updatedAt: new Date(),
     })
