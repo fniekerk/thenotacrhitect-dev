@@ -3,7 +3,7 @@ import { getAllPosts } from "@/lib/posts";
 export const dynamic = "force-dynamic";
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.thenotarchitect.dev";
 const SITE_TITLE = "The Not Architect";
 const SITE_DESCRIPTION =
   "Business and technology in equal measure — people, process, and delivery. I draw boxes, cross them out, and ship.";

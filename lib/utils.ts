@@ -44,6 +44,6 @@ export function truncate(str: string, maxLength: number): string {
  */
 export function absoluteUrl(path: string): string {
   const base =
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.thenotarchitect.dev";
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }
