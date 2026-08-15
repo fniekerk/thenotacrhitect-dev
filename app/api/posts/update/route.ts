@@ -3,10 +3,11 @@ import { verifyToken } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { posts } from "@/lib/db/schema";
 import type { TocEntry } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
-interface CreatePostBody {
-  title: string;
+interface UpdatePostBody {
   slug: string;
+  title: string;
   description: string;
   date: string;
   tags: string[];
@@ -16,70 +17,52 @@ interface CreatePostBody {
 }
 
 function extractToc(mdx: string): TocEntry[] {
-  const lines = mdx.split("\n");
   const toc: TocEntry[] = [];
-  let inFrontmatter = false;
-  let frontmatterDone = false;
-
-  for (const line of lines) {
-    if (!frontmatterDone) {
-      if (line.trim() === "---") {
-        inFrontmatter = !inFrontmatter;
-        if (!inFrontmatter) frontmatterDone = true;
-      }
-      continue;
-    }
-
+  for (const line of mdx.split("\n")) {
     const match = line.match(/^(#{2,3})\s+(.+)$/);
     if (!match?.[1] || !match?.[2]) continue;
-
     const depth = match[1].length;
     const title = match[2].trim();
     const url = `#${title.toLowerCase().replace(/[^\w\s-]/g, "").trim().replace(/\s+/g, "-")}`;
     toc.push({ title, url, depth });
   }
-
   return toc;
 }
 
-export async function POST(request: NextRequest) {
+export async function PUT(request: NextRequest) {
   const token = request.cookies.get("__Host-admin_token")?.value;
   if (!token || !(await verifyToken(token))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body: CreatePostBody = await request.json();
-  const { title, slug, description, date, tags, published, author, content } = body;
+  const body: UpdatePostBody = await request.json();
+  const { slug, title, description, date, tags, published, author, content } = body;
 
-  if (!title || !slug || !description || !date || !content) {
+  if (!slug || !title || !description || !date || !content) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-  }
-
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
-    return NextResponse.json({ error: "Invalid slug format" }, { status: 400 });
   }
 
   const toc = extractToc(content);
 
-  try {
-    await db.insert(posts).values({
-      slug,
+  const [updated] = await db
+    .update(posts)
+    .set({
       title,
       description,
       date,
       content,
-      published: published ?? true,
+      published,
       tags: tags ?? [],
       author: author || null,
       toc,
-    });
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes("unique") || msg.includes("duplicate")) {
-      return NextResponse.json({ error: "A post with this slug already exists" }, { status: 409 });
-    }
-    throw err;
+      updatedAt: new Date(),
+    })
+    .where(eq(posts.slug, slug))
+    .returning({ slug: posts.slug });
+
+  if (!updated) {
+    return NextResponse.json({ error: "Post not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ ok: true, slug }, { status: 201 });
+  return NextResponse.json({ ok: true, slug });
 }
