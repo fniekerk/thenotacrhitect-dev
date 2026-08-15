@@ -37,10 +37,10 @@ export default function OGImage() {
               fontSize: 28,
               fontWeight: 900,
               color: "#fff",
-              fontFamily: "serif",
+              fontFamily: "sans-serif",
             }}
           >
-            ✕
+            X
           </div>
           <span
             style={{
@@ -66,17 +66,33 @@ export default function OGImage() {
         >
           <div
             style={{
-              fontSize: 64,
-              fontWeight: 800,
-              color: "#f0f4ff",
-              fontFamily: "sans-serif",
-              lineHeight: 1.1,
-              maxWidth: 900,
+              display: "flex",
+              flexDirection: "column",
+              gap: 4,
             }}
           >
-            Business and technology
-            <br />
-            <span style={{ color: "#e05a2b" }}>in equal measure.</span>
+            <div
+              style={{
+                fontSize: 64,
+                fontWeight: 800,
+                color: "#f0f4ff",
+                fontFamily: "sans-serif",
+                lineHeight: 1.1,
+              }}
+            >
+              Business and technology
+            </div>
+            <div
+              style={{
+                fontSize: 64,
+                fontWeight: 800,
+                color: "#e05a2b",
+                fontFamily: "sans-serif",
+                lineHeight: 1.1,
+              }}
+            >
+              in equal measure.
+            </div>
           </div>
           <div
             style={{
