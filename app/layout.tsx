@@ -25,7 +25,7 @@ const orgSchema = {
   name: "The Not Architect",
   url: SITE_URL,
   logo: `${SITE_URL}/thenotarchitect_logo_final.svg`,
-  sameAs: ["https://github.com/fniekerk"],
+  sameAs: ["https://www.linkedin.com/in/frederick-niekerk-b3446987/"],
 };
 
 const siteSchema = {
@@ -59,6 +59,9 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  twitter: {
+    card: "summary_large_image",
   },
 };
 
