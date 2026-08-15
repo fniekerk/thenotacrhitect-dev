@@ -53,6 +53,13 @@ export async function getAllTags(): Promise<string[]> {
   return Array.from(tagSet).sort();
 }
 
+export async function getAllPostsAdmin(): Promise<Post[]> {
+  return db
+    .select()
+    .from(posts)
+    .orderBy(desc(posts.date)) as Promise<Post[]>;
+}
+
 export async function getAllSlugs(): Promise<string[]> {
   const result = await db
     .select({ slug: posts.slug })

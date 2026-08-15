@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 function slugify(text: string) {
   return text
@@ -17,7 +16,6 @@ function today() {
 }
 
 export default function NewPostPage() {
-  const router = useRouter();
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [slugManual, setSlugManual] = useState(false);
@@ -87,22 +85,9 @@ export default function NewPostPage() {
     }
   }
 
-  async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
-  }
-
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold">New Post</h1>
-        <button
-          onClick={handleLogout}
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Sign out
-        </button>
-      </div>
+    <div>
+      <h1 className="text-2xl font-bold mb-8">New Post</h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <Field label="Title" required>

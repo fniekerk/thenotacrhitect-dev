@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 
 export default function EditPostPage() {
-  const router = useRouter();
   const { slug } = useParams<{ slug: string }>();
 
   const [title, setTitle] = useState("");
@@ -77,30 +76,13 @@ export default function EditPostPage() {
     }
   }
 
-  async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
-  }
-
   if (fetching) {
-    return (
-      <div className="max-w-3xl mx-auto">
-        <p className="text-muted-foreground text-sm">Loading post…</p>
-      </div>
-    );
+    return <p className="text-muted-foreground text-sm">Loading post…</p>;
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold">Edit Post</h1>
-        <button
-          onClick={handleLogout}
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Sign out
-        </button>
-      </div>
+    <div>
+      <h1 className="text-2xl font-bold mb-8">Edit Post</h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <Field label="Title" required>
