@@ -3,6 +3,7 @@ import { getPostBySlug, getAllPosts } from "@/lib/posts";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+export const alt = "The Not Architect — post cover image";
 
 interface Props {
   params: Promise<{ slug: string }>;

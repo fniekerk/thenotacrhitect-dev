@@ -7,10 +7,15 @@ import { PostCard } from "@/components/blog/PostCard";
 import { AnimatedSection } from "@/components/animations/AnimatedSection";
 import { PostsContainer } from "@/components/animations/PostsContainer";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
   title: "The Not Architect — Business & Technology Blog",
   description:
     "Business and technology in equal measure — people, process, and delivery. I draw boxes, cross them out, and ship.",
+  openGraph: {
+    url: SITE_URL,
+  },
 };
 
 export default async function HomePage() {
