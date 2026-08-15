@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import rehypeSlug from "rehype-slug";
 import { getPostBySlug, getAllSlugs } from "@/lib/posts";
@@ -120,6 +121,21 @@ export default async function PostPage({ params }: PostPageProps) {
           )}
         </p>
       </AnimatedSection>
+
+      {post.image && (
+        <AnimatedSection delay={0.1} className="mb-8">
+          <div className="relative w-full aspect-[2/1] rounded-lg overflow-hidden">
+            <Image
+              src={post.image}
+              alt={post.title}
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 768px) 100vw, 768px"
+            />
+          </div>
+        </AnimatedSection>
+      )}
 
       {post.toc && post.toc.length > 0 && (
         <AnimatedSection direction="left" delay={0.1} className="mb-8">
