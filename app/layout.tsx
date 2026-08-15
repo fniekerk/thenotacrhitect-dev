@@ -16,6 +16,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+const orgSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": `${SITE_URL}/#org`,
+  name: "The Not Architect",
+  url: SITE_URL,
+  logo: `${SITE_URL}/thenotarchitect_logo_final.svg`,
+  sameAs: ["https://github.com/fniekerk"],
+};
+
+const siteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${SITE_URL}/#website`,
+  name: "The Not Architect",
+  url: SITE_URL,
+  description:
+    "Business and technology in equal measure — people, process, and delivery.",
+  publisher: { "@id": `${SITE_URL}/#org` },
+  inLanguage: "en-US",
+};
+
 export const metadata: Metadata = {
   title: {
     default: "The Not Architect",
@@ -23,9 +47,10 @@ export const metadata: Metadata = {
   },
   description:
     "Business and technology in equal measure — people, process, and delivery. I draw boxes, cross them out, and ship.",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
-  ),
+  metadataBase: new URL(SITE_URL),
+  alternates: {
+    canonical: SITE_URL,
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -46,6 +71,16 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteSchema) }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-background text-foreground`}
       >

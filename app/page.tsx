@@ -15,8 +15,28 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const posts = await getAllPosts();
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const itemListSchema = posts.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        itemListElement: posts.map((p, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: p.title,
+          url: `${siteUrl}/posts/${p.slug}`,
+        })),
+      }
+    : null;
+
   return (
     <div>
+      {itemListSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+        />
+      )}
       <AnimatedSection className="mb-12">
         <h1 className="sr-only">
           The Not Architect — I draw boxes, cross them out, and ship.

@@ -27,16 +27,26 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   const post = await getPostBySlug(slug);
   if (!post) return {};
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const postUrl = `${siteUrl}/posts/${slug}`;
+
   return {
     title: post.title,
     description: post.description,
+    alternates: {
+      canonical: postUrl,
+    },
     openGraph: {
       title: post.title,
       description: post.description,
       type: "article",
+      url: postUrl,
       publishedTime: post.date,
+      modifiedTime: post.date,
       authors: post.author ? [post.author] : undefined,
-      images: post.image ? [post.image] : undefined,
+      images: post.image
+        ? [{ url: post.image, width: 1200, height: 630, alt: post.title }]
+        : undefined,
     },
   };
 }
@@ -46,8 +56,41 @@ export default async function PostPage({ params }: PostPageProps) {
   const post = await getPostBySlug(slug);
   if (!post || !post.published) notFound();
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const postUrl = `${siteUrl}/posts/${slug}`;
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: { "@type": "Person", name: post.author ?? "The Not Architect" },
+    publisher: { "@id": `${siteUrl}/#org` },
+    mainEntityOfPage: postUrl,
+    ...(post.image && { image: post.image }),
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: post.title, item: postUrl },
+    ],
+  };
+
   return (
     <article className="max-w-3xl mx-auto">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <AnimatedSection className="mb-10">
         <div className="flex flex-wrap gap-1.5 mb-4">
           {post.tags.map((tag) => (
