@@ -44,9 +44,9 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
       publishedTime: post.date,
       modifiedTime: post.date,
       authors: post.author ? [post.author] : undefined,
-      images: post.image
-        ? [{ url: post.image, width: 1200, height: 630, alt: post.title }]
-        : undefined,
+      ...(post.image && {
+        images: [{ url: post.image, width: 1200, height: 630, alt: post.title }],
+      }),
     },
   };
 }
