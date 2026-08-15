@@ -28,6 +28,7 @@ export default function NewPostPage() {
   const [image, setImage] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
   const [imageError, setImageError] = useState("");
+  const [imageInBlob, setImageInBlob] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
@@ -53,11 +54,24 @@ export default function NewPostPage() {
         return;
       }
       setImage(data.url);
+      setImageInBlob(true);
     } catch {
       setImageError("Upload failed.");
     } finally {
       setImageUploading(false);
     }
+  }
+
+  async function handleRemoveImage() {
+    if (imageInBlob && image) {
+      await fetch("/api/upload", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: image }),
+      }).catch(() => {});
+    }
+    setImage("");
+    setImageInBlob(false);
   }
 
   function handleSlugChange(value: string) {
@@ -203,7 +217,7 @@ export default function NewPostPage() {
                   <p className="text-xs text-muted-foreground truncate max-w-xs">{image}</p>
                   <button
                     type="button"
-                    onClick={() => setImage("")}
+                    onClick={handleRemoveImage}
                     className="text-xs text-red-500 hover:underline self-start"
                   >
                     Remove

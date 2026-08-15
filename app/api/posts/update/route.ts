@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { del } from "@vercel/blob";
 import { verifyToken } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { posts } from "@/lib/db/schema";
@@ -44,6 +45,24 @@ export async function PUT(request: NextRequest) {
   }
 
   const toc = extractToc(content);
+
+  // Fetch the current image before overwriting so we can clean up blob storage.
+  const [existing] = await db
+    .select({ image: posts.image })
+    .from(posts)
+    .where(eq(posts.slug, slug))
+    .limit(1);
+
+  const oldImage = existing?.image ?? null;
+  const newImage = image !== undefined ? (image || null) : oldImage;
+
+  if (oldImage && oldImage !== newImage && oldImage.includes("blob.vercel-storage.com")) {
+    try {
+      await del(oldImage);
+    } catch {
+      // best-effort — don't fail the update if blob deletion fails
+    }
+  }
 
   const [updated] = await db
     .update(posts)

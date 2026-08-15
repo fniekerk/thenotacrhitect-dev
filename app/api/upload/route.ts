@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { put } from "@vercel/blob";
+import { put, del } from "@vercel/blob";
 import { verifyToken } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
@@ -30,4 +30,21 @@ export async function POST(request: NextRequest) {
   const blob = await put(filename, file, { access: "public" });
 
   return NextResponse.json({ url: blob.url }, { status: 201 });
+}
+
+export async function DELETE(request: NextRequest) {
+  const token = request.cookies.get("__Host-admin_token")?.value;
+  if (!token || !(await verifyToken(token))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await request.json().catch(() => ({}));
+  const { url } = body as { url?: string };
+
+  if (!url || !url.includes("blob.vercel-storage.com")) {
+    return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
+  }
+
+  await del(url);
+  return NextResponse.json({ ok: true });
 }
