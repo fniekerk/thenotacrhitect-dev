@@ -8,6 +8,7 @@ import { AnimatedSection } from "@/components/animations/AnimatedSection";
 import { PostsContainer } from "@/components/animations/PostsContainer";
 
 export const metadata: Metadata = {
+  title: "The Not Architect — Business & Technology Blog",
   description:
     "Business and technology in equal measure — people, process, and delivery. I draw boxes, cross them out, and ship.",
 };
@@ -48,6 +49,8 @@ export default async function HomePage() {
             width={680}
             height={320}
             priority
+            fetchPriority="high"
+            sizes="(max-width: 640px) 100vw, 680px"
             className="h-auto w-full max-w-xl block"
           />
         </div>

@@ -56,6 +56,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     siteName: "The Not Architect",
   },
+  keywords: [
+    "software architecture",
+    "technology leadership",
+    "business technology",
+    "systems thinking",
+    "engineering leadership",
+    "C4 diagrams",
+    "technical blog",
+  ],
   robots: {
     index: true,
     follow: true,
