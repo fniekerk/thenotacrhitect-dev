@@ -4,6 +4,7 @@ import { PostCard } from "@/components/blog/PostCard";
 import type { Post } from "@/lib/posts";
 
 const mockPost: Post = {
+  id: 1,
   slug: "hello-world",
   title: "Hello World",
   description: "A test post description.",
@@ -11,6 +12,7 @@ const mockPost: Post = {
   published: true,
   tags: ["test", "meta"],
   author: "Test Author",
+  image: null,
   content: "",
   toc: [],
 };

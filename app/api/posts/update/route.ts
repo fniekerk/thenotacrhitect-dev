@@ -58,7 +58,7 @@ export async function PUT(request: NextRequest) {
       updatedAt: new Date(),
     })
     .where(eq(posts.slug, slug))
-    .returning({ slug: posts.slug });
+    .returning();
 
   if (!updated) {
     return NextResponse.json({ error: "Post not found" }, { status: 404 });
