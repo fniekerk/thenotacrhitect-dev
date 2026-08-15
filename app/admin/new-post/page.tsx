@@ -25,6 +25,9 @@ export default function NewPostPage() {
   const [author, setAuthor] = useState("");
   const [published, setPublished] = useState(true);
   const [content, setContent] = useState("");
+  const [image, setImage] = useState("");
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageError, setImageError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
@@ -33,6 +36,27 @@ export default function NewPostPage() {
     setTitle(value);
     if (!slugManual) {
       setSlug(slugify(value));
+    }
+  }
+
+  async function handleImageChange(file: File | undefined) {
+    if (!file) return;
+    setImageError("");
+    setImageUploading(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok) {
+        setImageError(data.error ?? "Upload failed.");
+        return;
+      }
+      setImage(data.url);
+    } catch {
+      setImageError("Upload failed.");
+    } finally {
+      setImageUploading(false);
     }
   }
 
@@ -63,6 +87,7 @@ export default function NewPostPage() {
           date,
           tags: parsedTags,
           author: author.trim() || undefined,
+          image: image || undefined,
           published,
           content,
         }),
@@ -154,6 +179,41 @@ export default function NewPostPage() {
           />
         </Field>
 
+        <Field label="Cover image" hint="JPEG, PNG, WebP, GIF or AVIF · max 10 MB">
+          <div className="flex flex-col gap-2">
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+              disabled={imageUploading}
+              onChange={(e) => handleImageChange(e.target.files?.[0])}
+              className={`${inputCls} file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-[#e05a2b] file:text-white hover:file:bg-[#c44d21] file:cursor-pointer`}
+            />
+            {imageUploading && (
+              <p className="text-xs text-muted-foreground">Uploading…</p>
+            )}
+            {imageError && (
+              <p className="text-xs text-red-500">{imageError}</p>
+            )}
+            {image && !imageUploading && (
+              <div className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={image} alt="Cover preview" className="h-16 w-24 object-cover rounded border border-border" />
+                <div className="flex flex-col gap-1 min-w-0">
+                  <p className="text-xs text-green-700 dark:text-green-400 font-medium">Uploaded</p>
+                  <p className="text-xs text-muted-foreground truncate max-w-xs">{image}</p>
+                  <button
+                    type="button"
+                    onClick={() => setImage("")}
+                    className="text-xs text-red-500 hover:underline self-start"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </Field>
+
         <Field label="Content (MDX)" required>
           <textarea
             value={content}
@@ -189,10 +249,10 @@ export default function NewPostPage() {
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || imageUploading}
           className="bg-[#e05a2b] hover:bg-[#c44d21] text-white font-semibold py-2.5 px-6 rounded-md transition-colors disabled:opacity-50 self-start"
         >
-          {loading ? "Publishing…" : "Publish post"}
+          {loading ? "Publishing…" : imageUploading ? "Uploading image…" : "Publish post"}
         </button>
       </form>
     </div>

@@ -12,6 +12,7 @@ interface CreatePostBody {
   tags: string[];
   published: boolean;
   author?: string;
+  image?: string;
   content: string;
 }
 
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body: CreatePostBody = await request.json();
-  const { title, slug, description, date, tags, published, author, content } = body;
+  const { title, slug, description, date, tags, published, author, image, content } = body;
 
   if (!title || !slug || !description || !date || !content) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -71,6 +72,7 @@ export async function POST(request: NextRequest) {
       published: published ?? true,
       tags: tags ?? [],
       author: author || null,
+      image: image || null,
       toc,
     });
   } catch (err: unknown) {
