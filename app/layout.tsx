@@ -64,6 +64,9 @@ export const metadata: Metadata = {
     "engineering leadership",
     "C4 diagrams",
     "technical blog",
+    "software delivery",
+    "tech strategy",
+    "architecture decisions",
   ],
   robots: {
     index: true,
