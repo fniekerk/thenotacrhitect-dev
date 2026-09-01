@@ -19,17 +19,18 @@ export function PostsContainer({ children }: PostsContainerProps) {
       const cards = ref.current?.querySelectorAll("article");
       if (!cards?.length) return;
 
-      gsap.from(cards, {
-        opacity: 0,
-        y: 32,
-        duration: 0.55,
-        stagger: 0.1,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: ref.current,
-          start: "top 85%",
-          once: true,
-        },
+      cards.forEach((card) => {
+        gsap.from(card, {
+          opacity: 0,
+          y: 32,
+          duration: 0.55,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: card,
+            start: "top 90%",
+            once: true,
+          },
+        });
       });
     });
 
