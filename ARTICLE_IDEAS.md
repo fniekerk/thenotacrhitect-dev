@@ -108,7 +108,7 @@ Track status: `[ ]` = idea · `[~]` = in progress · `[x]` = published
 - [ ] The Test That Passes and Still Lies to You
 - [ ] Code Review Is Culture Review
 - [ ] The Deploy Pipeline as a Product
-- [ ] On Boring Technology and the Courage to Choose It
+- [ ] The Meeting Where We Chose the Boring Option and Nobody Clapped
 - [ ] The Operational Checklist Nobody Fills Out Until It's Too Late
 
 ## Career, Craft & Self-Aware Humour
