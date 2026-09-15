@@ -17,7 +17,7 @@ Track status: `[ ]` = idea · `[~]` = in progress · `[x]` = published
 - [ ] One-on-Ones Nobody Cancels
 - [ ] Radical Candour Without the Cult
 - [ ] The Difference Between Mentoring and Sponsoring (and Why One Actually Moves Careers)
-- [ ] When to Let a Team Struggle and When to Step In
+- [ ] The Team That Only Escalates Up Is a Team That Has Stopped Thinking
 - [ ] The Meeting That Should Have Been a Decision
 - [ ] High Performers Who Quietly Destroy Teams
 - [ ] What Psychological Safety Actually Looks Like at 9pm on a Friday
@@ -51,7 +51,7 @@ Track status: `[ ]` = idea · `[~]` = in progress · `[x]` = published
 - [ ] The Sprint That Never Ends
 - [ ] Ship Small, Learn Fast Is Advice Without a Method
 - [ ] Scope Creep Is a Relationship Problem
-- [ ] Technical Debt Is Product Debt — Start Calling It That
+- [ ] The Refactor Nobody Approved and Everybody Needed
 - [ ] The Backlog Is a Graveyard
 - [ ] RICE Scoring and Other Ways to Pretend You're Not Guessing
 - [ ] When to Kill a Feature Nobody Asked For
