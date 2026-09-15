@@ -28,7 +28,7 @@ Track status: `[ ]` = idea · `[~]` = in progress · `[x]` = published
 - [ ] Microservices Did Not Save You — You Just Moved the Mess
 - [ ] The C4 Model Is Not a Deliverable
 - [ ] When Event-Driven Is the Answer to the Wrong Question
-- [ ] Monolith First, Always
+- [ ] The Distributed System You Built to Avoid Talking to Each Other
 - [ ] The API That Lied: Why Contract Testing Isn't Optional
 - [ ] Your README Is Your Architecture Diagram
 - [ ] Database Migrations at 3am: A Love Story
@@ -52,7 +52,7 @@ Track status: `[ ]` = idea · `[~]` = in progress · `[x]` = published
 - [ ] Ship Small, Learn Fast Is Advice Without a Method
 - [ ] Scope Creep Is a Relationship Problem
 - [ ] The Refactor Nobody Approved and Everybody Needed
-- [ ] The Backlog Is a Graveyard
+- [ ] The Ticket Nobody Closed and the Feature Nobody Wanted
 - [ ] RICE Scoring and Other Ways to Pretend You're Not Guessing
 - [ ] When to Kill a Feature Nobody Asked For
 - [ ] OKRs Work If You Don't Treat Them Like KPIs
