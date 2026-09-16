@@ -17,29 +17,15 @@ interface CreatePostBody {
 }
 
 function extractToc(mdx: string): TocEntry[] {
-  const lines = mdx.split("\n");
   const toc: TocEntry[] = [];
-  let inFrontmatter = false;
-  let frontmatterDone = false;
-
-  for (const line of lines) {
-    if (!frontmatterDone) {
-      if (line.trim() === "---") {
-        inFrontmatter = !inFrontmatter;
-        if (!inFrontmatter) frontmatterDone = true;
-      }
-      continue;
-    }
-
+  for (const line of mdx.split("\n")) {
     const match = line.match(/^(#{2,3})\s+(.+)$/);
     if (!match?.[1] || !match?.[2]) continue;
-
     const depth = match[1].length;
     const title = match[2].trim();
     const url = `#${title.toLowerCase().replace(/[^\w\s-]/g, "").trim().replace(/\s+/g, "-")}`;
     toc.push({ title, url, depth });
   }
-
   return toc;
 }
 
