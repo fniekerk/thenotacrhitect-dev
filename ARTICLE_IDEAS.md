@@ -6,7 +6,7 @@ Track status: `[ ]` = idea · `[~]` = in progress · `[x]` = published
 
 ## Leadership & People
 
-- [ ] The Feedback Sandwich Is a Lie — and Everyone Knows It
+- [~] The Feedback Sandwich Is a Lie — and Everyone Knows It
 - [ ] Why Your Best Engineers Stop Talking in Meetings
 - [ ] Hiring for "Culture Fit" Is Just Hiring for Comfort
 - [ ] The Senior Engineer Who Hasn't Shipped in Six Months
